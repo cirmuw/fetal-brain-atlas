@@ -28,27 +28,27 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
     No inital template is needed. 
 
     ARGS: 
-        input_shape: 
-        n_condns: 
-        nb_unet_features: 
-        bool_bdir:
-        src_feats: 
-        seg_feats:
-        kernel_size: 
-        conv_nb_features: 
-        ch: 
-        init:
+        input_shape: Input image shape  (H, W, D)
+        n_condns:  dimension of the condition 
+        nb_unet_features: VoxelMorph UNet architecture 
+        bool_bdir: make bidirectional use of the deformation field
+        src_feats: channels of the template 
+        seg_feats: channels of the anatomical labels
+        kernel_size: kernel size 
+        conv_nb_features: number of convolutional features 
+        ch: channels 
+        init: initialization 
 
     MODEL INPUT: 
-        image_inputs:
-        condn:
+        image_inputs: Input images (H, W, D)
+        condn: Input conditions (B, )
 
     MODEL OUTPUT:
-        moved_atla:
-        moved_labels:
-        moved_subject:
-        new_atlas:
-        diff_field:
+        moved_atlas: generated template warped into the subject space
+        moved_labels: associated anatomical labels of the template warped into the subject space (using the same deformation field)
+        moved_subject: backward warp. Meaning the subject is warped by the inverse deformation field into the atlas space
+        new_atlas: generated template 
+        diff_field: deformation field
 
     """
 
@@ -170,7 +170,26 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
         super().__init__(inputs=[image_inputs, condn], outputs=ops)
 
 class ProjectionDiscriminator(ne.modelio.LoadableModel):
+    """
+    Projection Discriminator adapted from 
+    https://github.com/neel-dey/Atlas-GAN/blob/4f30012d742432c9f565c1676a2fce1342a61e1f/src/networks.py#L461
+    
+    Added additional downsampling.  
 
+    ARGS: 
+        input_shape: Input image shape  (H, W, D)
+        n_condns: dimension of the condition 
+        ch: channels
+        init: initialization 
+        src_feats: channels of the template 
+
+    MODEL INPUT: 
+        image_inputs: Input images (B, H, W, D, C). Default channel size is 1
+        condn: Input conditions (B, )  
+
+    MODEL OUTPUT: 
+        op: projection discriminator logits 
+    """
     @ne.modelio.store_config_args    
     def __init__(self, 
                  input_shape,

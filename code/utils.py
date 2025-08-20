@@ -5,6 +5,12 @@ import nibabel as nib
 def probHeterogeneous(attributes):
     """
     Assigns inverse-frequency-based probabilities to each value in attributes.
+
+    ARGS INPUT: 
+        attributes: conditions 
+
+    ARGS OUTPUT: 
+        weights: weights to balance the pick rate of the heterogeneous dataset
     """
     
     arr = np.round(attributes)
@@ -29,12 +35,13 @@ def save_nifti_image(
     ):
     """
     Save image(s) as NIfTI files, handling flexible input shapes.
+    Used in inference script.
 
-    Parameters:
-    - image: np.ndarray or torch.Tensor
-    - output_path: base file path (e.g., 'out/image.nii.gz')
-    - target_shape: expected (H, W, D)
-    - affine: 4x4 affine matrix (default = identity)
+    ARGS INPUT:
+        image: np.ndarray or torch.Tensor
+        output_path: base file path (e.g., 'out/image.nii.gz')
+        target_shape: expected (H, W, D)
+        affine: 4x4 affine matrix (default = identity)
     """
 
     if hasattr(image, 'detach'):

@@ -1,5 +1,9 @@
 """
 Example training script 
+
+Script makes use of the following GIT repositories: 
+https://github.com/voxelmorph/voxelmorph
+https://github.com/neel-dey/Atlas-GAN/tree/main
 """
 
 import sys
@@ -20,6 +24,10 @@ def load_config(config_path):
     return config
 
 def main(config_path):
+    """
+    ARGS:
+        config_path: path to the config file
+    """
 
     mse_loss_fn = tf.keras.losses.MeanSquaredError()
     bce_loss_fn = tf.keras.losses.BinaryCrossentropy()
@@ -103,7 +111,16 @@ def main(config_path):
     @tf.function
     def train_disc_step(target_image, real_image, target_condn, real_cond):
         """
-        
+        Discriminator training step
+
+        ARGS INPUT: 
+            target_image: real samples used for generating templates
+            real_image: real samples  
+            target_condn: conditions used for generting templates
+            real_condn: conditions of the real samples 
+
+        ARGS OUTPUT: 
+            total_disc_loss: total discriminator loss
         """
         with tf.GradientTape() as disc_tape:
 
@@ -121,7 +138,6 @@ def main(config_path):
 
             disc_real_loss = disc_loss_fn(tf.ones_like(disc_logits_real_local), disc_logits_real_local)
             disc_fake_loss = disc_loss_fn(tf.zeros_like(disc_logits_fake_local), disc_logits_fake_local)
-
             
             total_disc_loss = 0.5*(disc_fake_loss + disc_real_loss)
 
@@ -133,7 +149,20 @@ def main(config_path):
     @tf.function
     def train_gen_step(real_image, real_cond, real_labels):
         """
-        
+        Generator training step: 
+
+        ARGS INPUT:
+            real_image: real samples
+            real_cond: conditions of the real samples
+            real_labels: segmentation labels (one-hot encoded)
+
+        ARGS OUPUT: 
+             gen_loss_total: total generator loss
+             sim_loss_fwd: image similarity (NCC) loss between (forward) warped atlas and real image
+             sim_loss_bwd: image similarity (NCC) loss between (backward) warped real image and atlas 
+             seg_loss_total: MSE loss of segmentation labels
+             smoothness_loss: smoothness of the deformation field / displacement
+             magnitude_loss: magnitude of the deformation field / displacement 
         
         """
         with tf.GradientTape() as gen_tape:
@@ -166,6 +195,7 @@ def main(config_path):
             disc_logits_fake = disc_model((moved_atlas, real_cond), training=True)
             adv_loss = disc_loss_fn(tf.ones_like(disc_logits_fake), disc_logits_fake)
 
+            # TOTAL GENERATOR LOSS 
             total_gen_loss = (
                 (training_cfg['weight_loss_reg_def_smoothness'] * smoothness_loss) +
                 (training_cfg['weight_loss_reg_def_magnitude'] * magnitude_loss) +
