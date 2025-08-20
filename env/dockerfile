@@ -1,0 +1,27 @@
+FROM tensorflow/tensorflow:2.4.0-gpu
+# execute by DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -t jtischer29/fetal_atlas:tensorflow -f Dockerfile . 
+USER root 
+
+WORKDIR /work/
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC \
+    && apt-get update
+
+RUN ln -fs /usr/share/zoneinfo/Europe/Vienna /etc/localtime
+
+RUN apt-get install -y git libgl1-mesa-glx ffmpeg libx264-dev python3-opencv
+RUN pip install voxelmorph tensorflow-addons==0.11.2 setuptools wheel scikit-build cmake pynrrd seaborn 
+RUN pip install --no-cache-dir opencv-python==4.6.0.66
+RUN git clone https://github.com/neel-dey/Atlas-GAN.git 
+
+# Rename src to AtlasGAN and add __init__.py to allow import 
+RUN mv Atlas-GAN/src Atlas-GAN/AtlasGAN 
+RUN touch Atlas-GAN/AtlasGAN/__init__.py
+# Skip MeanStream import. Not used and will cause import error
+RUN sed -i '/MeanStream_old/d' Atlas-GAN/AtlasGAN/networks.py
+
+ENV PYTHONPATH="/work/Atlas-GAN"
+
+COPY ./code/ /app
+
+CMD ["/bin/bash"]

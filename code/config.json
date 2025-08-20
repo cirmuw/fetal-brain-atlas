@@ -1,0 +1,41 @@
+{
+  "input": {
+    "data_path": "data",
+    "img_suffix": "-svr.nii.gz",
+    "seg_suffix": "-seg.nii.gz",
+    "img_res": [128, 128, 96],
+    "cond_dim": 1,
+    "cond_num": 17,
+    "seg_channels": 6
+  },
+  "model": {
+    "vxm_unet_arch_enc": [16, 32, 32, 32],
+    "vxm_unet_arch_dec": [32, 32, 32, 32, 32, 16, 16]
+  },
+  "training": {
+    "num_epoch": 300,
+    "lr_gen": 0.0001,
+    "lr_disc": 0.0003,
+    "beta_1": 0.0,
+    "beta_2": 0.9,
+    "epsilon": 0.0000001,
+    "batch_size": 1,
+    "weight_loss_img": 1.0,
+    "weight_loss_seg": 0.5,
+    "weight_loss_reg_mov_magnitude": 0.0,
+    "weight_loss_reg_def_magnitude": 0.1,
+    "weight_loss_reg_def_smoothness": 0.8,
+    "weight_loss_adverserial": 0.5, 
+    "bidir": true,
+    "weight_bidir_forward": 0.9,
+    "weight_bidir_backward": 0.1,
+    "train_step_gen": 1,
+    "disc_loss": "MSE",
+    "train_step_disc": 5
+  },
+  "out": {
+    "output_model_path": "out",
+    "name_best_model_weights": "best_model_weights",
+    "output_inference_path": "inference"
+  }
+}
