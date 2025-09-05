@@ -83,7 +83,7 @@ sub-0002-ses-02022024;12
     "vxm_unet_arch_dec": [32, 32, 32, 32, 32, 16, 16]
   },
   "training": {
-    "num_epoch": 300,
+    "num_epoch": 500,
     "lr_gen": 0.0001,
     "lr_disc": 0.0003,
     "beta_1": 0.0,
@@ -92,17 +92,16 @@ sub-0002-ses-02022024;12
     "batch_size": 1,
     "weight_loss_img": 1.0,
     "weight_loss_seg": 0.5,
-    "weight_loss_reg_mov_magnitude": 0.0,
-    "weight_loss_reg_def_magnitude": 0.1,
+    "weight_loss_reg_def_magnitude": 1.0,
     "weight_loss_reg_def_smoothness": 0.8,
-    "weight_loss_adverserial": 0.5, 
+    "weight_loss_adverserial": 0.25, 
     "bidir": true,
     "disc_loss": "MSE",
     "weight_bidir_forward": 0.9,
     "weight_bidir_backward": 0.1,
 
     "train_step_gen": 1,
-    "train_step_disc": 5
+    "train_step_disc": 1
   },
   "output_model_path": "out",
   "name_best_model_weights": "best_model_weights",

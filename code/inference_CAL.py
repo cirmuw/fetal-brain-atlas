@@ -94,7 +94,8 @@ def main():
             save_nifti_image(image=moved_label, target_shape=input_cfg['img_res'], output_path=os.path.join(out_cfg['output_inference_path'], f'{str(cond)}_moved_label.nii.gz'))
             
 
-            # Continue here with further evaluation
+            # Continue here with further evaluation, laplacian filter, ... 
+
 
     print('DONE')
 

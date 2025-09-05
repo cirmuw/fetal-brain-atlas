@@ -78,17 +78,17 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
             condn_vec = KL.LeakyReLU(0.2)(condn_vec)
 
         # Input layer of decoder: learned parameter vector
-        const_vec = KL.Lambda(const_inp)(condn)  # use condn to get batch info
+        const_vec = KL.Lambda(const_inp)(condn)  
         condn_dense= KL.Dense(np.prod(conv_image_shape),
                                  kernel_initializer=tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.02,),
                                  bias_initializer=tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.02,),
                                  )(const_vec)
 
-        # Reshape to feature map and FiLM for convolutional processing:
+        # Reshape 
         condn_reshape = KL.Reshape(conv_image_shape)(condn_dense)
         condn_film = FiLM(init=init)([condn_reshape, condn_vec])
 
-        # 5 ResBlocks at lower resolution:
+        # INTENSITY IMAGE DECODER BLOCK
         s1 = conv_block(condn_film, ch, condn_emb=condn_vec, sn=True, init=init,)
         sres = 1.0 * s1
 
@@ -98,15 +98,14 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
             sres = conv_block(sres, ch, condn_emb=condn_vec, sn=True, init=init)
             sres = sres + sip
 
-        # Upsample --> More Conv+FiLM+LeakyReLU blocks:
         dec_out = conv_dec_film(
-            sres,
-            condn_vec,
-            8,
-            (64, 64, 64, 8),
-            2,
-            [3, 3, 3],
-            8,
+            condn_emb=sres,
+            condn_vec=condn_vec,
+            nb_features=conv_nb_features,
+            input_shape=conv_image_shape,
+            nb_levels=2,
+            conv_size=kernel_size,
+            nb_labels=seg_feats,
             sn=True,
             init=init,
         )
@@ -119,7 +118,7 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
 
         new_atlas = KL.Activation('tanh')(pout)
         
-        # 5 ResBlocks at lower resolution:
+        # SEGMENTATION DECODER BLOCK
         s1_seg = conv_block(condn_film, ch, condn_emb=condn_vec, sn=True, init=init,)
         sres_seg = 1.0 * s1_seg
 
@@ -129,19 +128,19 @@ class AtlasGenerationModel(ne.modelio.LoadableModel):
             sres_seg = conv_block(sres_seg, ch, condn_emb=condn_vec, sn=True, init=init)
             sres_seg = sres_seg + sip
 
-        # Upsample --> More Conv+FiLM+LeakyReLU blocks:
         dec_out_seg = conv_dec_film(
-            sres_seg,
-            condn_vec,
-            8,
-            (64, 64, 64, 8),
-            2,
-            [3, 3, 3],
-            8,
+            condn_emb=sres_seg,
+            condn_vec=condn_vec,
+            nb_features=conv_nb_features,
+            input_shape=conv_image_shape,
+            nb_levels=2,
+            conv_size=kernel_size,
+            nb_labels=seg_feats,
             sn=True,
             init=init,
             prefix='seg'
         )
+
         last_tensor_seg = dec_out_seg
 
         new_seg = KL.Conv3D(
@@ -210,10 +209,10 @@ class ProjectionDiscriminator(ne.modelio.LoadableModel):
         down3 = conv_block(down2, ch*4, sn=True, stride=2, init=init)
         down4 = conv_block(down3, ch*8, sn=True, stride=2, init=init)
         down5 = conv_block(down4, ch*16, sn=True, stride=2, init=init)
-        down6 = conv_block(down5, ch*32, sn=True, stride=2, init=init)
+        #down6 = conv_block(down5, ch*32, sn=True, stride=2, init=init)
 
         # If using SN on discriminator output:
-        fin1 = conv_block(down6, ch, sn=True, activation=False, init=init)
+        fin1 = conv_block(down5, ch, sn=True, activation=False, init=init)
 
         # Local projection discriminator feedback:
         op_age = SpectralNormalization(KL.Conv3D(
