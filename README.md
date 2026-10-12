@@ -74,9 +74,9 @@ sub-0002-ses-02022024;12
     "img_suffix": "-svr.nii.gz",
     "seg_suffix": "-seg.nii.gz",
     "img_res": [128, 128, 96],
-    "cond_dim": 1,
-    "cond_num": 17,
-    "seg_channels": 6
+    "cond_dim": 1,                    # dimension of condition
+    "cond_num": 17,                   # number of unique conditions
+    "seg_channels": 6                 # number of brain labels
   },
   "model": {
     "vxm_unet_arch_enc": [16, 32, 32, 32],
