@@ -56,6 +56,7 @@ def main():
     model = AtlasGenerationModel(
         input_shape=input_cfg['img_res'],
         n_condns=input_cfg['cond_dim'],
+        seg_feats = input_cfg['seg_channels'],
         nb_unet_features=[model_cfg['vxm_unet_arch_enc'], model_cfg['vxm_unet_arch_dec']], 
         bool_bidir=training_cfg['bidir']
     )  
