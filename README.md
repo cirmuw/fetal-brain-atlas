@@ -111,12 +111,15 @@ sub-0002-ses-02022024;12
 
 ## How to cite
 ```
-@inproceedings{your_paper,
+@inproceedings{FetalAtlas2025,
   title={Conditional Fetal Brain Atlas Learning for Automatic Tissue Segmentation},
   author={J. Tischer, P. Kienast, M Stuempflen, G. Kasprian, G. Langs, and R. Licandro},
-  booktitle={MICCAI PIPPI},
+  booktitle={Perinatal, Preterm and Paediatric Image Analysis (PIPPI), MICCAI 2025},
   year={2025},
-  doi={}
+  publisher={Springer Nature Switzerland},
+  address={Cham},
+  pages={36--47},
+  doi={https://doi.org/10.1007/978-3-032-05997-0_4}
 }
 ```
 
